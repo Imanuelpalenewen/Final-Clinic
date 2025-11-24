@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, Clock, CheckCircle, RefreshCw, XCircle } from 'lucide-react';
+import { Users, Clock, CheckCircle, XCircle } from 'lucide-react';
 import axios from '../../lib/axios';
 import { getStatusLabel, getStatusColor } from '../../utils/statusHelper';
 
@@ -12,7 +12,6 @@ export default function AdminDashboard() {
   });
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -21,15 +20,9 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  const fetchDashboardData = async (isRefresh = false) => {
+  const fetchDashboardData = async () => {
     try {
-      if (isRefresh) {
-        setRefreshing(true);
-      }
-      
-      // Add timestamp to prevent caching
-      const timestamp = new Date().getTime();
-      const response = await axios.get(`/queue?_t=${timestamp}`);
+      const response = await axios.get('/queue');
       const queueData = response.data || [];
       
       setQueue(queueData);
@@ -49,16 +42,10 @@ export default function AdminDashboard() {
       });
       
       setLoading(false);
-      setRefreshing(false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       setLoading(false);
-      setRefreshing(false);
     }
-  };
-  
-  const handleRefresh = () => {
-    fetchDashboardData(true);
   };
 
   const handleCancelQueue = async (id, queueNumber) => {
@@ -87,23 +74,13 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard Admin</h1>
-        <div className="flex gap-2">
-          <button
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-          <Link
-            to="/admin/patient-registration"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Users className="w-4 h-4" />
-            Registrasi Pasien Baru
-          </Link>
-        </div>
+        <Link
+          to="/admin/patient-registration"
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        >
+          <Users className="w-4 h-4" />
+          Registrasi Pasien Baru
+        </Link>
       </div>
 
       {/* Stats Cards */}
