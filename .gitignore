@@ -1,0 +1,63 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+package-lock.json
+yarn.lock
+
+# Build
+dist/
+build/
+.cache/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# System
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# SQLite temporary
+*.sqlite-journal
+*.db-journal
+*.db-shm
+*.db-wal
+
+# AI related
+/.cursor
+/.claude
+/.lovable
+/chat-history
+/temp
+/.ai
+/.windsurf
+
+# Logs
+logs/
+*.log
+
+# Testing
+coverage/
+.nyc_output/
+
+# OS
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Documentation (exclude all .md except README.md)
+*.md
+!README.md

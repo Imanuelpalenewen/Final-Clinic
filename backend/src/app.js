@@ -8,6 +8,7 @@ import patientsRoutes from './routes/patientsRoutes.js';
 import queueRoutes from './routes/queueRoutes.js';
 import medicinesRoutes from './routes/medicinesRoutes.js';
 import transactionsRoutes from './routes/transactionsRoutes.js';
+import reportsRoutes from './routes/reportsRoutes.js';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true
 }));
 app.use(express.json());
@@ -36,6 +37,7 @@ app.use('/api/patients', patientsRoutes);
 app.use('/api/queue', queueRoutes);
 app.use('/api/medicines', medicinesRoutes);
 app.use('/api/transactions', transactionsRoutes);
+app.use('/api/reports', reportsRoutes);
 
 // 404 handler
 app.use((req, res) => {

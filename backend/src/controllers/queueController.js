@@ -191,12 +191,12 @@ export const pharmacySubmitPrescription = (req, res) => {
       });
     }
 
-    // Check stock availability
+    // Check stock availability (BUSINESS RULE: Stock cannot go negative)
     for (const item of prescriptions) {
       if (item.stock < item.quantity) {
         return res.status(400).json({
           success: false,
-          message: `Stok obat ${item.medicine_name} tidak mencukupi (tersedia: ${item.stock}, diminta: ${item.quantity})`
+          message: `Stok obat ${item.medicine_name} tidak cukup (Stok: ${item.stock}, Butuh: ${item.quantity})`
         });
       }
     }
@@ -230,10 +230,11 @@ export const pharmacySubmitPrescription = (req, res) => {
 
     res.json({
       success: true,
-      message: 'Resep berhasil diproses',
+      message: 'Resep berhasil diproses, status changed to cashier',
       data: {
         queue: updatedQueue,
-        total_cost: totalCost
+        total_cost: totalCost,
+        stock_updated: true
       }
     });
   } catch (error) {
@@ -241,6 +242,114 @@ export const pharmacySubmitPrescription = (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Terjadi kesalahan saat memproses resep',
+      error: error.message
+    });
+  }
+};
+
+// Cancel queue (Admin only)
+export const cancelQueue = (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if queue exists
+    const queue = db.prepare('SELECT * FROM queue WHERE id = ?').get(id);
+    if (!queue) {
+      return res.status(404).json({
+        success: false,
+        message: 'Antrian tidak ditemukan'
+      });
+    }
+
+    // Update status to cancelled
+    const updateStmt = db.prepare(
+      "UPDATE queue SET status = 'cancelled', updated_at = CURRENT_TIMESTAMP WHERE id = ?"
+    );
+    updateStmt.run(id);
+
+    res.json({
+      success: true,
+      message: 'Queue cancelled'
+    });
+  } catch (error) {
+    console.error('Cancel queue error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat membatalkan antrian',
+      error: error.message
+    });
+  }
+};
+
+// Edit prescription (Doctor only, only if status still 'doctor')
+export const editPrescription = (req, res) => {
+  try {
+    const { id } = req.params;
+    const { diagnosis, doctor_notes, prescriptions } = req.body;
+
+    // Check queue status
+    const queue = db.prepare('SELECT status FROM queue WHERE id = ?').get(id);
+    if (!queue) {
+      return res.status(404).json({
+        success: false,
+        message: 'Antrian tidak ditemukan'
+      });
+    }
+
+    // BUSINESS RULE: Can only edit if status still 'doctor'
+    if (queue.status !== 'doctor') {
+      return res.status(400).json({
+        success: false,
+        message: 'Resep sudah diproses apotek, tidak bisa diedit'
+      });
+    }
+
+    // Update in transaction
+    const updateExam = db.transaction(() => {
+      // Update diagnosis and notes
+      if (diagnosis) {
+        const updateQueue = db.prepare(
+          'UPDATE queue SET diagnosis = ?, doctor_notes = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        );
+        updateQueue.run(diagnosis, doctor_notes || null, id);
+      }
+
+      // Delete old prescriptions and insert new ones
+      if (prescriptions) {
+        const deletePrescriptions = db.prepare('DELETE FROM prescriptions WHERE queue_id = ?');
+        deletePrescriptions.run(id);
+
+        if (prescriptions.length > 0) {
+          const insertPrescription = db.prepare(
+            'INSERT INTO prescriptions (queue_id, medicine_id, quantity) VALUES (?, ?, ?)'
+          );
+
+          prescriptions.forEach(item => {
+            insertPrescription.run(id, item.medicine_id, item.quantity);
+          });
+        }
+      }
+    });
+
+    updateExam();
+
+    const updatedQueue = db.prepare(`
+      SELECT q.*, p.name as patient_name 
+      FROM queue q 
+      JOIN patients p ON q.patient_id = p.id
+      WHERE q.id = ?
+    `).get(id);
+
+    res.json({
+      success: true,
+      message: 'Resep berhasil diupdate',
+      data: updatedQueue
+    });
+  } catch (error) {
+    console.error('Edit prescription error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Terjadi kesalahan saat mengedit resep',
       error: error.message
     });
   }

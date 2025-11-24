@@ -5,30 +5,30 @@ import { AuthProvider, useAuth } from './hooks/useAuth.jsx';
 import Login from './pages/Login';
 import Layout from './components/Layout';
 
-// Admin Pages (will create these next)
+// Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminPatientRegistration from './pages/admin/PatientRegistration';
 import AdminPatientManagement from './pages/admin/PatientManagement';
 import AdminPayments from './pages/admin/Payments';
-import AdminReports from './pages/admin/Reports';
 
 // Doctor Pages
 import DoctorDashboard from './pages/doctor/Dashboard';
 import DoctorExaminations from './pages/doctor/Examinations';
-import DoctorPrescriptions from './pages/doctor/Prescriptions';
 
 // Pharmacist Pages
 import PharmacistDashboard from './pages/pharmacist/Dashboard';
-import PharmacistPrescriptions from './pages/pharmacist/Prescriptions';
-import PharmacistStock from './pages/pharmacist/Stock';
-
-// Cashier Pages
-import CashierDashboard from './pages/cashier/Dashboard';
+import PharmacistProcessPrescription from './pages/pharmacist/ProcessPrescription';
+import PharmacistStockManagement from './pages/pharmacist/StockManagement';
 
 // Owner Pages
 import OwnerDashboard from './pages/owner/Dashboard';
 import OwnerReports from './pages/owner/Reports';
-import OwnerAccounts from './pages/owner/Accounts';
+
+// Patient Pages
+import PatientDashboard from './pages/patient/Dashboard';
+import PatientActiveQueue from './pages/patient/ActiveQueue';
+import PatientMedicalHistory from './pages/patient/MedicalHistory';
+import PatientPrescriptionHistory from './pages/patient/PrescriptionHistory';
 
 // Protected Route Component
 function ProtectedRoute({ children, allowedRoles }) {
@@ -75,25 +75,25 @@ function AppRoutes() {
       <Route path="/admin/patient-registration" element={<ProtectedRoute allowedRoles={['admin']}><AdminPatientRegistration /></ProtectedRoute>} />
       <Route path="/admin/patient-management" element={<ProtectedRoute allowedRoles={['admin']}><AdminPatientManagement /></ProtectedRoute>} />
       <Route path="/admin/payments" element={<ProtectedRoute allowedRoles={['admin']}><AdminPayments /></ProtectedRoute>} />
-      <Route path="/admin/reports" element={<ProtectedRoute allowedRoles={['admin']}><AdminReports /></ProtectedRoute>} />
 
       {/* Doctor Routes */}
       <Route path="/doctor/dashboard" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorDashboard /></ProtectedRoute>} />
       <Route path="/doctor/examinations" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorExaminations /></ProtectedRoute>} />
-      <Route path="/doctor/prescriptions" element={<ProtectedRoute allowedRoles={['doctor']}><DoctorPrescriptions /></ProtectedRoute>} />
 
       {/* Pharmacist Routes */}
       <Route path="/pharmacist/dashboard" element={<ProtectedRoute allowedRoles={['pharmacist']}><PharmacistDashboard /></ProtectedRoute>} />
-      <Route path="/pharmacist/prescriptions" element={<ProtectedRoute allowedRoles={['pharmacist']}><PharmacistPrescriptions /></ProtectedRoute>} />
-      <Route path="/pharmacist/stock" element={<ProtectedRoute allowedRoles={['pharmacist']}><PharmacistStock /></ProtectedRoute>} />
-
-      {/* Cashier Routes */}
-      <Route path="/cashier/dashboard" element={<ProtectedRoute allowedRoles={['cashier']}><CashierDashboard /></ProtectedRoute>} />
+      <Route path="/pharmacist/process" element={<ProtectedRoute allowedRoles={['pharmacist']}><PharmacistProcessPrescription /></ProtectedRoute>} />
+      <Route path="/pharmacist/stock" element={<ProtectedRoute allowedRoles={['pharmacist']}><PharmacistStockManagement /></ProtectedRoute>} />
 
       {/* Owner Routes */}
       <Route path="/owner/dashboard" element={<ProtectedRoute allowedRoles={['owner']}><OwnerDashboard /></ProtectedRoute>} />
       <Route path="/owner/reports" element={<ProtectedRoute allowedRoles={['owner']}><OwnerReports /></ProtectedRoute>} />
-      <Route path="/owner/accounts" element={<ProtectedRoute allowedRoles={['owner']}><OwnerAccounts /></ProtectedRoute>} />
+
+      {/* Patient Routes */}
+      <Route path="/patient/dashboard" element={<ProtectedRoute allowedRoles={['patient']}><PatientDashboard /></ProtectedRoute>} />
+      <Route path="/patient/active-queue" element={<ProtectedRoute allowedRoles={['patient']}><PatientActiveQueue /></ProtectedRoute>} />
+      <Route path="/patient/medical-history" element={<ProtectedRoute allowedRoles={['patient']}><PatientMedicalHistory /></ProtectedRoute>} />
+      <Route path="/patient/prescription-history" element={<ProtectedRoute allowedRoles={['patient']}><PatientPrescriptionHistory /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<div className="min-h-screen flex items-center justify-center"><h1>404 - Page Not Found</h1></div>} />

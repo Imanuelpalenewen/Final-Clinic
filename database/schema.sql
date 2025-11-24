@@ -7,19 +7,21 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    role VARCHAR(20) NOT NULL CHECK(role IN ('admin', 'doctor', 'pharmacist', 'cashier', 'owner')),
+    role VARCHAR(20) NOT NULL CHECK(role IN ('admin', 'doctor', 'pharmacist', 'owner', 'patient')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Table: patients (Data pasien)
 CREATE TABLE IF NOT EXISTS patients (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NULL,  -- Link ke users (untuk patient yang punya akun login)
     no_rm VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
     dob DATE NOT NULL,
     address TEXT,
     phone VARCHAR(20),
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 -- Table: queue (Antrian pasien)
@@ -27,9 +29,11 @@ CREATE TABLE IF NOT EXISTS queue (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     queue_number INTEGER NOT NULL,
     patient_id INTEGER NOT NULL,
+    is_emergency BOOLEAN DEFAULT 0,
+    complaint TEXT,
     status VARCHAR(20) DEFAULT 'waiting' CHECK(status IN ('waiting', 'doctor', 'pharmacy', 'cashier', 'completed', 'cancelled')),
-    doctor_notes TEXT,
     diagnosis TEXT,
+    doctor_notes TEXT,
     total_cost DECIMAL(10,2) DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -60,7 +64,7 @@ CREATE TABLE IF NOT EXISTS prescriptions (
 CREATE TABLE IF NOT EXISTS transactions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     queue_id INTEGER NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
+    total_amount DECIMAL(10,2) NOT NULL,
     payment_method VARCHAR(20) DEFAULT 'cash' CHECK(payment_method IN ('cash', 'debit', 'credit')),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (queue_id) REFERENCES queue(id) ON DELETE CASCADE

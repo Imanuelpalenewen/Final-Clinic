@@ -3,12 +3,20 @@ import db from '../models/db.js';
 // Create payment transaction
 export const createTransaction = (req, res) => {
   try {
-    const { queue_id, amount, payment_method } = req.body;
+    const { queue_id, total_amount, payment_method } = req.body;
 
-    if (!queue_id || !amount) {
+    // Validation
+    if (!queue_id || !total_amount) {
       return res.status(400).json({
         success: false,
-        message: 'Queue ID dan amount harus diisi'
+        message: 'Queue ID dan total amount harus diisi'
+      });
+    }
+
+    if (total_amount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Total amount harus lebih dari 0'
       });
     }
 
@@ -45,9 +53,9 @@ export const createTransaction = (req, res) => {
     const processPayment = db.transaction(() => {
       // Insert transaction
       const insertStmt = db.prepare(
-        'INSERT INTO transactions (queue_id, amount, payment_method) VALUES (?, ?, ?)'
+        'INSERT INTO transactions (queue_id, total_amount, payment_method) VALUES (?, ?, ?)'
       );
-      const result = insertStmt.run(queue_id, amount, payment_method || 'cash');
+      const result = insertStmt.run(queue_id, total_amount, payment_method || 'cash');
 
       // Update queue status to completed
       const updateQueue = db.prepare(

@@ -11,8 +11,9 @@ const router = express.Router();
 // All routes require authentication
 router.use(verifyToken);
 
-router.post('/', checkRole('cashier'), createTransaction);
-router.get('/', getAllTransactions);
-router.get('/:id', getTransactionById);
+// Admin acts as cashier in this system
+router.post('/', checkRole('admin'), createTransaction);
+router.get('/', checkRole('admin', 'owner'), getAllTransactions);
+router.get('/:id', checkRole('admin', 'owner'), getTransactionById);
 
 export default router;
