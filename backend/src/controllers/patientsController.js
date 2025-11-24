@@ -125,15 +125,15 @@ export const createPatient = (req, res) => {
         });
       }
 
-      // Patient exists but no active queue - create new queue
+      // Patient exists but no active queue - create new queue with proper timestamp
       const nextQueueNumber = getNextQueueNumber();
       
       // Convert boolean to integer for SQLite
       const emergencyFlag = is_emergency ? 1 : 0;
       
       const insertQueue = db.prepare(
-        `INSERT INTO queue (queue_number, patient_id, is_emergency, complaint, status) 
-         VALUES (?, ?, ?, ?, ?)`
+        `INSERT INTO queue (queue_number, patient_id, is_emergency, complaint, status, created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`
       );
       insertQueue.run(nextQueueNumber, existingPatient.id, emergencyFlag, complaint || null, 'waiting');
 
@@ -173,10 +173,10 @@ export const createPatient = (req, res) => {
       // Get next queue number (daily reset)
       const nextQueueNumber = getNextQueueNumber();
 
-      // Add to queue automatically
+      // Add to queue automatically with proper timestamp
       const insertQueue = db.prepare(
-        `INSERT INTO queue (queue_number, patient_id, is_emergency, complaint, status) 
-         VALUES (?, ?, ?, ?, ?)`
+        `INSERT INTO queue (queue_number, patient_id, is_emergency, complaint, status, created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, datetime('now', 'localtime'), datetime('now', 'localtime'))`
       );
       // Convert boolean to integer for SQLite
       const emergencyFlag = is_emergency ? 1 : 0;
