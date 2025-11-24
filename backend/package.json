@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "init-db": "node src/utils/initDb.js"
+    "init-db": "node src/utils/initDb.js",
+    "seed": "node src/utils/smartSeed.js",
+    "seed:full": "node src/utils/comprehensiveSeed.js"
   },
   "keywords": [
     "klinik",

@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS patients (
     no_rm VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100) NOT NULL,
     dob DATE NOT NULL,
+    gender VARCHAR(1) CHECK(gender IN ('L', 'P')),  -- L = Laki-laki, P = Perempuan
     address TEXT,
     phone VARCHAR(20),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -43,7 +44,7 @@ CREATE TABLE IF NOT EXISTS queue (
 -- Table: medicines (Stok obat)
 CREATE TABLE IF NOT EXISTS medicines (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     stock INTEGER DEFAULT 0,
     unit VARCHAR(20),
     price DECIMAL(10,2) NOT NULL,

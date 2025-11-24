@@ -87,13 +87,21 @@ const getNextQueueNumber = () => {
 // Create new patient (AUTO ADD TO QUEUE) - Updated with business rules
 export const createPatient = (req, res) => {
   try {
-    const { name, dob, address, phone, complaint, is_emergency } = req.body;
+    const { name, dob, gender, address, phone, complaint, is_emergency } = req.body;
 
     // Validation
     if (!name || !dob || !address || !phone) {
       return res.status(400).json({
         success: false,
         message: 'Nama, tanggal lahir, alamat, dan telepon harus diisi'
+      });
+    }
+    
+    // Validate gender if provided
+    if (gender && !['L', 'P'].includes(gender)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Jenis kelamin harus L (Laki-laki) atau P (Perempuan)'
       });
     }
 
@@ -157,9 +165,9 @@ export const createPatient = (req, res) => {
 
       // 2. Insert patient with user_id
       const insertStmt = db.prepare(
-        'INSERT INTO patients (user_id, no_rm, name, dob, address, phone) VALUES (?, ?, ?, ?, ?, ?)'
+        'INSERT INTO patients (user_id, no_rm, name, dob, gender, address, phone) VALUES (?, ?, ?, ?, ?, ?, ?)'
       );
-      const insertResult = insertStmt.run(userId, no_rm, name, dob, address, phone);
+      const insertResult = insertStmt.run(userId, no_rm, name, dob, gender || null, address, phone);
       const patientId = insertResult.lastInsertRowid;
 
       // Get next queue number (daily reset)

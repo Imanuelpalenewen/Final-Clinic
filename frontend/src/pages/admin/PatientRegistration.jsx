@@ -9,6 +9,7 @@ export default function PatientRegistration() {
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
+    gender: '',
     address: '',
     phone: '',
     complaint: '',
@@ -40,6 +41,7 @@ export default function PatientRegistration() {
     setFormData({
       name: patient.name,
       dob: patient.dob,
+      gender: patient.gender || '',
       address: patient.address || '',
       phone: patient.phone || '',
       complaint: '',
@@ -65,7 +67,7 @@ export default function PatientRegistration() {
     setSuccess(null);
 
     // Validation
-    if (!formData.name || !formData.dob || !formData.address || !formData.phone) {
+    if (!formData.name || !formData.dob || !formData.gender || !formData.address || !formData.phone) {
       setError('Semua field dengan tanda * harus diisi');
       return;
     }
@@ -83,6 +85,7 @@ export default function PatientRegistration() {
       setFormData({
         name: '',
         dob: '',
+        gender: '',
         address: '',
         phone: '',
         complaint: '',
@@ -103,6 +106,7 @@ export default function PatientRegistration() {
     setFormData({
       name: '',
       dob: '',
+      gender: '',
       address: '',
       phone: '',
       complaint: '',
@@ -265,6 +269,24 @@ export default function PatientRegistration() {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Jenis Kelamin <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              disabled={!!selectedPatient}
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
+            >
+              <option value="">Pilih Jenis Kelamin</option>
+              <option value="L">Laki-laki</option>
+              <option value="P">Perempuan</option>
+            </select>
           </div>
 
           <div className="md:col-span-2">

@@ -23,19 +23,23 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       const response = await axios.get('/queue');
-      const queueData = response.data || [];
+      const allQueueData = response.data || [];
       
-      setQueue(queueData);
+      // Filter ONLY today's data - use more reliable date comparison
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
       
-      // Calculate stats (only today's data)
-      const today = new Date().toISOString().split('T')[0];
-      const todayQueue = queueData.filter(q => 
-        q.created_at.startsWith(today)
-      );
+      const todayQueue = allQueueData.filter(q => {
+        const qDate = new Date(q.created_at);
+        return qDate >= todayStart && qDate <= todayEnd;
+      });
+      
+      setQueue(todayQueue); // Show ONLY today's queue
       
       setStats({
         totalPatients: todayQueue.length,
-        activeQueues: queueData.filter(q => 
+        activeQueues: todayQueue.filter(q => 
           !['completed', 'cancelled'].includes(q.status)
         ).length,
         completedToday: todayQueue.filter(q => q.status === 'completed').length

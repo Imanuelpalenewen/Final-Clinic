@@ -59,6 +59,30 @@ export const createMedicine = (req, res) => {
         message: 'Nama, satuan, dan harga harus diisi'
       });
     }
+    
+    // Check for duplicate medicine name
+    const existing = db.prepare('SELECT id FROM medicines WHERE name = ?').get(name);
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: 'Nama obat sudah ada dalam database'
+      });
+    }
+    
+    // Validate stock and price cannot be negative
+    if (stock < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Stok tidak boleh negatif'
+      });
+    }
+    
+    if (price < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Harga tidak boleh negatif'
+      });
+    }
 
     const insertStmt = db.prepare(
       'INSERT INTO medicines (name, stock, unit, price) VALUES (?, ?, ?, ?)'
@@ -93,6 +117,21 @@ export const updateMedicine = (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Obat tidak ditemukan'
+      });
+    }
+    
+    // Validate stock and price cannot be negative
+    if (stock < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Stok tidak boleh negatif'
+      });
+    }
+    
+    if (price < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Harga tidak boleh negatif'
       });
     }
 

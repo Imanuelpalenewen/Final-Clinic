@@ -87,8 +87,31 @@ export default function ActiveQueue() {
 
             <div className="flex justify-between items-center py-3 border-b">
               <span className="text-gray-600">Waktu Pendaftaran</span>
-              <span className="font-medium">{formatTime(activeQueue.created_at)}</span>
+              <span className="font-medium">
+                {new Date(activeQueue.created_at).toLocaleString('id-ID', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
             </div>
+            
+            {activeQueue.updated_at && activeQueue.updated_at !== activeQueue.created_at && (
+              <div className="flex justify-between items-center py-3 border-b">
+                <span className="text-gray-600">Terakhir Diupdate</span>
+                <span className="font-medium text-blue-600">
+                  {new Date(activeQueue.updated_at).toLocaleString('id-ID', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+            )}
 
             {activeQueue.complaint && (
               <div className="py-3">

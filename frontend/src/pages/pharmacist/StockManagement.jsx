@@ -48,11 +48,18 @@ export default function StockManagement() {
 
   const handleSave = async () => {
     try {
+      // Convert to numbers on submit
+      const submitData = {
+        ...formData,
+        stock: Number(formData.stock || 0),
+        price: Number(formData.price || 0)
+      };
+
       if (editingMedicine) {
-        await axios.put(`/medicines/${editingMedicine.id}`, formData);
+        await axios.put(`/medicines/${editingMedicine.id}`, submitData);
         alert('Data obat berhasil diperbarui');
       } else {
-        await axios.post('/medicines', formData);
+        await axios.post('/medicines', submitData);
         alert('Obat baru berhasil ditambahkan');
       }
       setShowModal(false);
@@ -177,9 +184,14 @@ export default function StockManagement() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Stok</label>
                   <input
-                    type="number"
+                    type="text"
                     value={formData.stock}
-                    onChange={(e) => setFormData({...formData, stock: e.target.value})}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "") return setFormData({...formData, stock: ""});
+                      if (/^[0-9]+$/.test(v)) setFormData({...formData, stock: v});
+                    }}
+                    placeholder="0"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -188,9 +200,14 @@ export default function StockManagement() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Harga (Rp)</label>
                 <input
-                  type="number"
+                  type="text"
                   value={formData.price}
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === "") return setFormData({...formData, price: ""});
+                    if (/^[0-9]+$/.test(v)) setFormData({...formData, price: v});
+                  }}
+                  placeholder="0"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
